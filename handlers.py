@@ -12,18 +12,21 @@ def add_contact(args, book: AddressBook):
         book.add_record(record)
         message = "Contact added"
     if phone:
-        record.add_phone(phone)
+        try:
+            record.add_phone(phone)
+        except ValueError as e:
+            return str(e)
     return message
 
 @input_error
 def update_contact(args, book: AddressBook):
     name, old_phone, new_phone = args
     record = book.find(name)
-    if record is None:
-        return f"Contact '{name}' not found."
-
-    record.edit_phone(old_phone, new_phone)
-    return f"Phone number for {name} updated from {old_phone} to {new_phone}."
+    try:
+        record.edit_phone(old_phone, new_phone)
+        return f"Phone number for {name} updated from {old_phone} to {new_phone}."
+    except ValueError as e:
+        return str(e)
     
 @input_error 
 def get_all_contacts(book: AddressBook):
@@ -35,19 +38,12 @@ def get_all_contacts(book: AddressBook):
 def get_one_contact(args, book: AddressBook):
     name = args[0]
     record = book.find(name)
-    if record is None:
-        return f"Contact '{name}' not found."
-
     phones = "; ".join(p.value for p in record.phones) if record.phones else "no phones"
     return f"{name}: {phones}"
     
 @input_error
 def delete_contact(args, book: AddressBook):
     name = args[0]
-    record = book.find(name)
-    if record is None:
-        return f"Contact '{name}' not found."
-
     book.delete(name)
     return f"Contact '{name}' deleted."
 
@@ -55,8 +51,6 @@ def delete_contact(args, book: AddressBook):
 def add_birthday(args, book: AddressBook):
     name, bday, *_ = args
     record = book.find(name)
-    if not record:
-        return "Contact not found."
     record.add_birthday(bday)
     return f"Birthday added for {name}: {bday}"
 
@@ -64,11 +58,9 @@ def add_birthday(args, book: AddressBook):
 def show_birthday(args, book: AddressBook):
     name = args[0]
     record = book.find(name)
-    if record and record.birthday:
+    if record.birthday:
         return f"{name}'s birthday is {record.birthday}"
-    elif record:
-        return f"{name} has no birthday set."
-    return "Contact not found."
+    return f"{name} has no birthday set."
 
 @input_error
 def birthdays(args, book: AddressBook):

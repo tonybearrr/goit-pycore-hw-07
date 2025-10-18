@@ -11,4 +11,6 @@ def input_error(func):
             return "Contact not found"
         except IndexError:
             return "Enter the argument for the command"
+        except AttributeError:
+            return "Contact not found"
     return inner

@@ -17,6 +17,9 @@ class Record:
         self.phones.append(Phone(phone))
 
     def edit_phone(self, old_phone, new_phone):
+        phone = self.find_phone(old_phone)
+        if not phone:
+            raise ValueError(f"Phone {old_phone} not found")
         for idx, phone in enumerate(self.phones):
             if phone.value == old_phone:
                 self.phones[idx] = Phone(new_phone)
